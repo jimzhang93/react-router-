@@ -18,16 +18,89 @@ $(function () {
     var $activitySelect = $optionsPanel.find('#activity-choices');
 
     // make all the option tags (second arg of `forEach` is a `this` binding)
-    hotels.forEach(makeOption, $hotelSelect);
-    restaurants.forEach(makeOption, $restaurantSelect);
-    activities.forEach(makeOption, $activitySelect);
+
+    // hotels.forEach(makeOption, $hotelSelect);
+    // restaurants.forEach(makeOption, $restaurantSelect);
+    // activities.forEach(makeOption, $activitySelect);
+
+
+    // $.ajax({
+    //   method: 'GET',
+    //   url: '/api/hotels'
+    // })
+    // .then(function(hotels){
+    //
+    //   hotels.forEach(function(hotel){
+    //     console.log(hotel);
+    //     makeOption.call($hotelSelect, hotel);
+    //   })
+    // })
+    // .catch(err);
+    //
+    //
+    // $.ajax({
+    //   method: 'GET',
+    //   url: '/api/hotels'
+    // })
+    // .then(function(hotels){
+    //
+    //   hotels.forEach(function(hotel){
+    //     console.log(hotel);
+    //     makeOption.call($hotelSelect, hotel);
+    //   })
+    // })
+    // .catch(err);
+
+
+    $.ajax({
+      method: 'GET',
+      url: '/api/hotels'
+    })
+    .then(function(hotels){
+
+      hotels.forEach(function(hotel){
+        console.log(hotel);
+        makeOption.call($hotelSelect, hotel);
+      });
+      attractionsModule.loadEnhancedAttractions('hotels', hotels);
+    })
+    .catch(console.err);
+
+    $.ajax({
+      method: 'GET',
+      url: '/api/restaurants'
+    })
+    .then(function(restaurants){
+
+      restaurants.forEach(function(restaurant){
+        console.log(restaurant);
+        makeOption.call($restaurantSelect, restaurant);
+      });
+      attractionsModule.loadEnhancedAttractions('restaurants', restaurants);
+    })
+    .catch(console.err);
+
+    $.ajax({
+      method: 'GET',
+      url: '/api/activities'
+    })
+    .then(function(activities){
+
+      activities.forEach(function(activity){
+        console.log(activity);
+        makeOption.call($activitySelect, activity);
+      });
+      attractionsModule.loadEnhancedAttractions('activities', activities);
+    })
+    .catch(console.err);
+
 
     // Once you've made AJAX calls to retrieve this information,
     // call attractions.loadEnhancedAttractions in the fashion
     // exampled below in order to integrate it.
-    attractionsModule.loadEnhancedAttractions('hotels', hotels);
-    attractionsModule.loadEnhancedAttractions('restaurants', restaurants);
-    attractionsModule.loadEnhancedAttractions('activities', activities);
+    // attractionsModule.loadEnhancedAttractions('hotels', hotels);
+    // attractionsModule.loadEnhancedAttractions('restaurants', restaurants);
+    // attractionsModule.loadEnhancedAttractions('activities', activities);
 
     function makeOption(databaseAttraction) {
         var $option = $('<option></option>') // makes a new option tag

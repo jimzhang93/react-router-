@@ -8,6 +8,7 @@ var db = require('./models');
 
 var app = express();
 var apiRoutes = require('./routes/api/attractions');
+var dayRoutes = require('./routes/api/days');
 // nunjucks rendering boilerplate
 nunjucks.configure('views', { noCache: true });
 app.set('view engine', 'html');
@@ -24,7 +25,9 @@ app.use('/jquery', express.static(path.join(__dirname, '/node_modules/jquery/dis
 
 // serve any other static files
 app.use(express.static(path.join(__dirname, '/public')));
+app.use('/api/days', dayRoutes);
 app.use('/api', apiRoutes);
+
 // serve dynamic routes
 app.use(require('./routes'));
 
