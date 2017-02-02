@@ -9,7 +9,11 @@ var Day = db.define('day', {
     allowNull: false
   }
 }, {
-
+  // setterMethods: {
+  //   set: function(day) {
+  //     day.number = day.id;
+  //   }
+  // }
 });
 
 

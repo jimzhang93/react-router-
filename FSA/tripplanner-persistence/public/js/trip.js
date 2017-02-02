@@ -1,5 +1,5 @@
 'use strict';
-/* global $ dayModule */
+/* global $ dayModule  controllerModule*/
 
 /**
  * A module for managing multiple days & application state.
@@ -15,39 +15,66 @@
  * which take `attraction` objects and pass them to `currentDay`.
  */
 
-var tripModule = (function () {
+var tripModule = (function() {
 
   // application state
 
   var days = [],
-      currentDay;
+    currentDay;
 
   // jQuery selections
 
   var $addButton, $removeButton;
-  $(function () {
+  $(function() {
     $addButton = $('#day-add');
     $removeButton = $('#day-title > button.remove');
   });
 
   // method used both internally and externally
 
-  function switchTo (newCurrentDay) {
-    if (currentDay) currentDay.hide();
+  function switchTo(newCurrentDay) {
+    //save current day
+    console.log('saving current day', currentDay);
+    if (currentDay) {
+      currentDay.hide();
+      controllerModule.saveDayDB(currentDay)
+        .then(function(successObj) {
+          console.log('Successfully saved current day', currentDay);
+          res.send(successObj);
+        })
+        .catch(console.error) //this is a promise
+    } else {
+      console.log('not current day');
+      res.send({
+        message: 'nothing updated'
+      });
+    }
+    console.log('after if else loop');
     currentDay = newCurrentDay;
     currentDay.show();
   }
 
   // jQuery event binding
 
-  $(function () {
+  $(function() {
     $addButton.on('click', addDay);
     $removeButton.on('click', deleteCurrentDay);
   });
 
-  function addDay () {
+  function addDay() {
     if (this && this.blur) this.blur(); // removes focus box from buttons
-    var newDay = dayModule.create({ number: days.length + 1 }); // dayModule
+    console.log('Creating New Day with days array length: ', days.length);
+    var newDay = dayModule.create({
+      number: days.length + 1
+    }); // dayModule
+    //add day to database
+    //find day with number if none exists, add to db, else
+
+    controllerModule.addDayDB(newDay)
+      .then(function(newDay) {
+        console.log('added newDay to DB: ', newDay);
+      })
+      .catch(console.error);
     days.push(newDay);
     if (days.length === 1) {
       currentDay = newDay;
@@ -55,7 +82,7 @@ var tripModule = (function () {
     switchTo(newDay);
   }
 
-  function deleteCurrentDay () {
+  function deleteCurrentDay() {
     // prevent deleting last day
     if (days.length < 2 || !currentDay) return;
     // remove from the collection
@@ -63,7 +90,7 @@ var tripModule = (function () {
       previousDay = days.splice(index, 1)[0],
       newCurrent = days[index] || days[index - 1];
     // fix the remaining day numbers
-    days.forEach(function (day, i) {
+    days.forEach(function(day, i) {
       day.setNumber(i + 1);
     });
     switchTo(newCurrent);
@@ -74,17 +101,26 @@ var tripModule = (function () {
 
   var publicAPI = {
 
-    load: function () {
-      $(addDay);
+    load: function() {
+
+      // Load Days
+      console.log('LOAD CALLED');
+      $.get('/api/days')
+        .then(function(daysFromDb) {
+          daysFromDb.forEach(function() {
+            addDay();
+          });
+        })
+        .catch(console.err);
     },
 
     switchTo: switchTo,
 
-    addToCurrent: function (attraction) {
+    addToCurrent: function(attraction) {
       currentDay.addAttraction(attraction);
     },
 
-    removeFromCurrent: function (attraction) {
+    removeFromCurrent: function(attraction) {
       currentDay.removeAttraction(attraction);
     }
 
