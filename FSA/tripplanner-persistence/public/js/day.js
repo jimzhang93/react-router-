@@ -97,8 +97,13 @@ var dayModule = (function() {
 
   // day updating
 
-  Day.prototype.addAttraction = function(attraction) {
+  Day.prototype.addAttraction = function(attraction, alreadyInDBBool) {
     // adding to the day object
+    var thisDay = this;
+    // if (!alreadyInDBBool) {
+    //   controllerModule.addAttractionToDayDB(thisDay, attraction.type,
+    //     attraction);
+    // }
     switch (attraction.type) {
       case 'hotel':
         if (this.hotel) this.hotel.hide();

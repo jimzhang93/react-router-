@@ -43,14 +43,16 @@ var tripModule = (function() {
           res.send(successObj);
         })
         .catch(console.error) //this is a promise
+      currentDay = newCurrentDay;
     } else {
       console.log('not current day');
       res.send({
         message: 'nothing updated'
       });
+      controllerModule.addAttractionsFromDay(newCurrentDay);
+      currentDay = newCurrentDay;
     }
     console.log('after if else loop');
-    currentDay = newCurrentDay;
     currentDay.show();
   }
 
@@ -80,6 +82,7 @@ var tripModule = (function() {
       currentDay = newDay;
     }
     switchTo(newDay);
+    return newDay;
   }
 
   function deleteCurrentDay() {
@@ -107,9 +110,18 @@ var tripModule = (function() {
       console.log('LOAD CALLED');
       $.get('/api/days')
         .then(function(daysFromDb) {
-          daysFromDb.forEach(function() {
-            addDay();
+          daysFromDb.forEach(function(day) {
+            console.log('LOADING THIS DAY:' + day);
+            console.dir(day);
+            day = addDay();
+            console.log('Calling to load attractions');
           });
+          return days;
+        })
+        .then(function(days) {
+          var lastDay = days[days.length - 1];
+          console.log('LAST FUCKING DAY', lastDay);
+          controllerModule.addAttractionsFromDay(lastDay);
         })
         .catch(console.err);
     },

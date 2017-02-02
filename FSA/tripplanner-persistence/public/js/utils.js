@@ -23,6 +23,7 @@ var utilsModule = {
   // pushes into array, but only if the item isn't already inside it
   pushUnique: function(array, item) {
     if (array.indexOf(item) > -1) return;
+    //add attraction to Day in DB
     return array.push(item);
   },
 
